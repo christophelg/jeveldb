@@ -1,95 +1,95 @@
 package com.github.christophelg.jeveldb;
 
-import com.github.christophelg.jeveldb.direct.DirectDb;
-
-import java.io.Closeable;
 import java.io.IOException;
 
+import com.github.christophelg.jeveldb.direct.DirectDb;
+
 /**
- * From:
- * https://github.com/google/leveldb/blob/master/include/leveldb/db.h
+ * From: https://github.com/google/leveldb/blob/master/include/leveldb/db.h
  *
- * A DB is a persistent ordered map from keys to values.
- * A DB is safe for concurrent access from multiple threads without any external synchronization.
+ * A DB is a persistent ordered map from keys to values. A DB is safe for concurrent access from
+ * multiple threads without any external synchronization.
  */
-public interface DB extends Closeable /*, SortedMap<byte[], byte[]> */ {
+public interface DB extends AutoCloseable /* , SortedMap<byte[], byte[]> */{
 
-    static DB open(Options options, String name) {
-        return new DirectDb(options, name);
-    }
+  static DB open(Options options, String name) {
+    return new DirectDb(options, name);
+  }
 
-    // Set the database entry for "key" to "value".  Returns OK on success,
-    // and a non-OK status on error.
-    // Note: consider setting options.sync = true.
-    void put(WriteOptions wo, byte[] key, byte[] value) throws IOException;
+  static void destroy(String name) {}
 
-    // Remove the database entry (if any) for "key".  Returns OK on
-    // success, and a non-OK status on error.  It is not an error if "key"
-    // did not exist in the database.
-    // Note: consider setting options.sync = true.
-    void delete(WriteOptions wo, byte[] key) throws IOException;
+  // Set the database entry for "key" to "value". Returns OK on success,
+  // and a non-OK status on error.
+  // Note: consider setting options.sync = true.
+  void put(WriteOptions wo, byte[] key, byte[] value) throws IOException;
 
-    // Apply the specified updates to the database.
-    // Returns OK on success, non-OK on failure.
-    // Note: consider setting options.sync = true.
-    void write(WriteOptions wo, WriteBatch batch) throws IOException;
+  // Remove the database entry (if any) for "key". Returns OK on
+  // success, and a non-OK status on error. It is not an error if "key"
+  // did not exist in the database.
+  // Note: consider setting options.sync = true.
+  void delete(WriteOptions wo, byte[] key) throws IOException;
 
+  // Apply the specified updates to the database.
+  // Returns OK on success, non-OK on failure.
+  // Note: consider setting options.sync = true.
+  void write(WriteOptions wo, WriteBatch batch) throws IOException;
 
-    // If the database contains an entry for "key" store the
-    // corresponding value in *value and return OK.
-    //
-    // If there is no entry for "key" leave *value unchanged and return
-    // a status for which Status::IsNotFound() returns true.
-    //
-    // May return some other Status on an error.
-    byte[] get(ReadOptions ro, byte[] key) throws IOException;
+  // If the database contains an entry for "key" store the
+  // corresponding value in *value and return OK.
+  //
+  // If there is no entry for "key" leave *value unchanged and return
+  // a status for which Status::IsNotFound() returns true.
+  //
+  // May return some other Status on an error.
+  byte[] get(ReadOptions ro, byte[] key) throws IOException;
 
-    // Return a heap-allocated iterator over the contents of the database.
-    // The result of NewIterator() is initially invalid (caller must
-    // call one of the Seek methods on the iterator before using it).
-    //
-    // Caller should delete the iterator when it is no longer needed.
-    // The returned iterator should be deleted before this db is deleted.
-    // public Iter iterator();
+  // Return a heap-allocated iterator over the contents of the database.
+  // The result of NewIterator() is initially invalid (caller must
+  // call one of the Seek methods on the iterator before using it).
+  //
+  // Caller should delete the iterator when it is no longer needed.
+  // The returned iterator should be deleted before this db is deleted.
+  Iter iterator(ReadOptions ro);
 
-    // Return a handle to the current DB state.  Iterators created with
-    // this handle will all observe a stable snapshot of the current DB
-    // state.  The caller must call ReleaseSnapshot(result) when the
-    // snapshot is no longer needed.
-    Snapshot getSnapshot() throws IOException;
+  // Return a handle to the current DB state. Iterators created with
+  // this handle will all observe a stable snapshot of the current DB
+  // state. The caller must call ReleaseSnapshot(result) when the
+  // snapshot is no longer needed.
+  Snapshot getSnapshot() throws IOException;
 
-    // Release a previously acquired snapshot.  The caller must not
-    // use "snapshot" after this call.
-    void releaseSnapshot() throws IOException;
+  // Release a previously acquired snapshot. The caller must not
+  // use "snapshot" after this call.
+  void releaseSnapshot() throws IOException;
 
-    // DB implementations can export properties about their state
-    // via this method.  If "property" is a valid property understood by this
-    // DB implementation, fills "*value" with its current value and returns
-    // true.  Otherwise returns false.
-    //
-    //
-    // Valid property names include:
-    //
-    //  "leveldb.num-files-at-level<N>" - return the number of files at level <N>,
-    //     where <N> is an ASCII representation of a level number (e.g. "0").
-    //  "leveldb.stats" - returns a multi-line string that describes statistics
-    //     about the internal operation of the DB.
-    //  "leveldb.sstables" - returns a multi-line string that describes all
-    //     of the sstables that make up the db contents.
-    //  "leveldb.approximate-memory-usage" - returns the approximate number of
-    //     bytes of memory in use by the DB.
-    String getProperty(String name);
+  // DB implementations can export properties about their state
+  // via this method. If "property" is a valid property understood by this
+  // DB implementation, fills "*value" with its current value and returns
+  // true. Otherwise returns false.
+  //
+  //
+  // Valid property names include:
+  //
+  // "leveldb.num-files-at-level<N>" - return the number of files at level <N>,
+  // where <N> is an ASCII representation of a level number (e.g. "0").
+  // "leveldb.stats" - returns a multi-line string that describes statistics
+  // about the internal operation of the DB.
+  // "leveldb.sstables" - returns a multi-line string that describes all
+  // of the sstables that make up the db contents.
+  // "leveldb.approximate-memory-usage" - returns the approximate number of
+  // bytes of memory in use by the DB.
+  String getProperty(String name);
 
-    // Compact the underlying storage for the key range [*begin,*end].
-    // In particular, deleted and overwritten versions are discarded,
-    // and the data is rearranged to reduce the cost of operations
-    // needed to access the data.  This operation should typically only
-    // be invoked by users who understand the underlying implementation.
-    //
-    // begin==NULL is treated as a key before all keys in the database.
-    // end==NULL is treated as a key after all keys in the database.
-    // Therefore the following call will compact the entire database:
-    //    db->CompactRange(NULL, NULL);
-    void compactRange(byte[] begin, byte[] end);
+  // Compact the underlying storage for the key range [*begin,*end].
+  // In particular, deleted and overwritten versions are discarded,
+  // and the data is rearranged to reduce the cost of operations
+  // needed to access the data. This operation should typically only
+  // be invoked by users who understand the underlying implementation.
+  //
+  // begin==NULL is treated as a key before all keys in the database.
+  // end==NULL is treated as a key after all keys in the database.
+  // Therefore the following call will compact the entire database:
+  // db->CompactRange(NULL, NULL);
+  void compactRange(byte[] begin, byte[] end) throws IOException;
+
+  WriteBatch newWriteBatch();
 }
-

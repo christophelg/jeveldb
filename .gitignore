@@ -14,3 +14,9 @@ hs_err_pid*
 # Intellij files
 .idea
 jeveldb.iml
+/target/
+
+# eclipse
+.classpath
+.project
+.settings/
