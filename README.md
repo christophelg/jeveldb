@@ -11,7 +11,7 @@ https://github.com/dain/leveldb
 
 * Built with Java 1.8
 * Use idiomatic java constructs
-* Only dependencies against guava, junit
+* Only has dependencies with guava and junit
 * Try to follow a TDD approach
 
 ## Specs
@@ -29,6 +29,6 @@ https://github.com/dain/leveldb
 | util/arena.cc | Arena | Not needed |
 | util/arena.h | Arena | Not needed |
 | util/arena_test.cc | Arena | Not needed |
-| util/bloom.cc | * BloomFilterPolicy* , *BloomHash* | in progress, waiting on util/hash.h |
-| util/hash.h | Hash | in progress, waiting on util/hash.cc |
-| util/hash.cc | Hash | in progress |
+| util/bloom.cc | * BloomFilterPolicy* , *BloomHash* | in progress |
+| util/hash.h | Hash | done |
+| util/hash.cc | Hash | done |
