@@ -22,3 +22,13 @@ https://github.com/dain/leveldb
 * Don't expose Status, replaced with exceptions
 * Don't expose Env
 
+## Status
+
+| File  | Class  | Status |
+| ------------ | --------------- | ----- |
+| util/arena.cc | Arena | Not needed |
+| util/arena.h | Arena | Not needed |
+| util/arena_test.cc | Arena | Not needed |
+| util/bloom.cc | * BloomFilterPolicy* , *BloomHash* | in progress, waiting on util/hash.h |
+| util/hash.h | Hash | in progress, waiting on util/hash.cc |
+| util/hash.cc | Hash | in progress |
