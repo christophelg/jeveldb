@@ -1,5 +1,5 @@
 # jeveldb
-A port of leveldb in java
+A port of leveldb in java.
 
 ## Motivation
 
