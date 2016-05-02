@@ -32,3 +32,7 @@ https://github.com/dain/leveldb
 | util/bloom.cc | * BloomFilterPolicy* , *BloomHash* | in progress |
 | util/hash.h | Hash | done |
 | util/hash.cc | Hash | done |
+| util/coding.cc | / | Not needed |
+| util/coding.h | / | Not needed |
+| util/comparator.cc | BytewiseComparatorImpl | in progress |
+
